@@ -6,6 +6,7 @@
 package cz.cvut.kotlito1.wpa.pres.model;
 
 import cz.cvut.kotlito1.wpa.pres.model.util.ContactType;
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -18,7 +19,7 @@ import javax.persistence.Id;
  * @author Tomas Kotlik <kotlito1 at fel.cvut.cz>
  */
 @Entity
-public class Contact {
+public class Contact  implements Serializable{
     @Id
     @GeneratedValue
     private Integer id;

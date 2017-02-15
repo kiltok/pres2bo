@@ -15,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -23,6 +25,10 @@ import javax.persistence.OneToOne;
  * @author Tomas Kotlik <kotlito1 at fel.cvut.cz>
  */
 @Entity
+@NamedQueries({
+@NamedQuery(name="Person.findBySurname",query="SELECT p FROM Person p WHERE p.sname = :surname"),
+@NamedQuery(name="Person.findByLogin",query="SELECT p FROM Person p WHERE p.uaccount.login = :login"),
+@NamedQuery(name="Person.findAllonAddress", query = "SELECT p FROM Person p WHERE p.address.id=:addrId")})
 public class Person implements Serializable {
     @Id
     @GeneratedValue
@@ -41,7 +47,7 @@ public class Person implements Serializable {
     @JoinColumn(name="PERSON_ID")
     private Collection<Contact> contacts;
     
-    @OneToOne(cascade=CascadeType.ALL)               //owns
+    @OneToOne            //owns
     UserAccount uaccount;
 
     //ctor

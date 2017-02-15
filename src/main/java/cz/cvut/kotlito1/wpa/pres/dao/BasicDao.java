@@ -76,6 +76,17 @@ public abstract class BasicDao<T> {
         }
     }
     
+    public void remove(Collection<T> entities){
+        Objects.requireNonNull(entities);
+        try{
+            if(entities.isEmpty())
+                return;
+            entities.forEach((entity) -> this.remove(entity));
+        }catch(RuntimeException rex){
+            LOG.error("BasicDAO remove entity collection failed >>"+rex.toString());
+        }
+    }
+    
     public T update(T entity){
         Objects.requireNonNull(entity);
         try{

@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserAccountController {
     
     @Autowired
-    UserAccountService uaccService;
+    private UserAccountService uaccService;
     
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Collection<UserAccount> getAll() {
