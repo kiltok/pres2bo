@@ -41,7 +41,7 @@ public class Person implements Serializable {
     @JoinColumn(name="PERSON_ID")
     private Collection<Contact> contacts;
     
-    @OneToOne               //owns
+    @OneToOne(cascade=CascadeType.ALL)               //owns
     UserAccount uaccount;
 
     //ctor
@@ -105,7 +105,6 @@ public class Person implements Serializable {
     public void setUaccount(UserAccount uaccount) {
         this.uaccount = uaccount;
     }
-    
-    
+   
     
 }

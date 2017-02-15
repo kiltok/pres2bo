@@ -5,6 +5,7 @@
  */
 package cz.cvut.kotlito1.wpa.pres.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -23,10 +24,10 @@ public class Address {
     private String location;
     private String street;
     
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private City city;              //owns    
     
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Country country;        //owns
 
     public Address() {
