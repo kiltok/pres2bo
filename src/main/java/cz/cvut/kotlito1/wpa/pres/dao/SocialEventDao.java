@@ -5,6 +5,7 @@
  */
 package cz.cvut.kotlito1.wpa.pres.dao;
 
+import cz.cvut.kotlito1.wpa.pres.exception.PersistenceException;
 import cz.cvut.kotlito1.wpa.pres.model.Address;
 import cz.cvut.kotlito1.wpa.pres.model.Person;
 import cz.cvut.kotlito1.wpa.pres.model.SocialEvent;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class SocialEventDao extends BasicDao<SocialEvent> {
     
-    private static final Logger LOG = LoggerFactory.getLogger(UserAccountDao.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SocialEventDao.class);
     
     @Autowired
     private AddressDao addrDao;
@@ -39,7 +40,7 @@ public class SocialEventDao extends BasicDao<SocialEvent> {
             return (SocialEvent) tq.setParameter("code", code).getSingleResult();
         }catch(RuntimeException rex){
             LOG.error("Social Event DAO named query find by code error >>"+rex.toString());
-            return null;
+            throw new PersistenceException("SocialEvent find by code failed.");
         }
     }
     
@@ -49,7 +50,7 @@ public class SocialEventDao extends BasicDao<SocialEvent> {
             return tq.setParameter("label", label).getResultList();
         }catch(RuntimeException rex){
             LOG.error("Social Event DAO named query find by code error >>"+rex.toString());
-            return null;
+            throw new PersistenceException("SocialEvent label exception.");
         }
     }
     
@@ -59,7 +60,7 @@ public class SocialEventDao extends BasicDao<SocialEvent> {
             return tq.setParameter("val", value).getResultList();
         }catch(RuntimeException rex){
             LOG.error("Social Event DAO named query find before date error >>"+rex.toString());
-            return null;
+            throw new PersistenceException("SocialEvent find active failed");
         }
     }
     
@@ -69,7 +70,7 @@ public class SocialEventDao extends BasicDao<SocialEvent> {
             return tq.setParameter("val", value).getResultList();
         }catch(RuntimeException rex){
             LOG.error("Social Event DAO named query find after date error >>"+rex.toString());
-            return null;
+            throw new PersistenceException("SocialEvent find running failed.");
         }
     }
     
@@ -79,7 +80,7 @@ public class SocialEventDao extends BasicDao<SocialEvent> {
             return tq.setParameter("val1", value1).getResultList();
         }catch(RuntimeException rex){
             LOG.error("Social Event DAO named query find between dates error >>"+rex.toString());
-            return null;
+            throw new PersistenceException("SocialEvent find finished failed.");
         }
     }
     
@@ -89,26 +90,36 @@ public class SocialEventDao extends BasicDao<SocialEvent> {
             return tq.getResultList();
         }catch(RuntimeException rex){
             LOG.error("Social Event DAO query find events at address id error >>"+rex.toString());
-            return null;
+            throw new PersistenceException("SocialEvent find events at address failed.");
         }
     }
     
     @Override
     public void remove(SocialEvent sev){
         //null creator+contact
+        try{
+        
         sev.setContact(null);
         sev.setCreator(null);
-        //address depends on the event or person
-        Address remAddr = em.find(Address.class, sev.getLocation());
-        TypedQuery tq = em.createQuery("SELECT COUNT(per) FROM Person per WHERE per.address.id = :addrId", Person.class);
-        Long countPersons =(Long) tq.setParameter("addrId", remAddr.getId()).getSingleResult();
-        tq = em.createQuery("SELECT COUNT(sev) FROM SocialEvent sev WHERE sev.location.id = :addrId", SocialEvent.class);
-        Long countEvents =(Long) tq.setParameter("addrId", remAddr.getId()).getSingleResult();
-        if(countEvents == 1 && countPersons == 0){  // event address referenced only once and exactly from this event
-            em.remove(remAddr);
-            sev.setLocation(remAddr);
+        if(sev.getLocation() != null){
+            Address remAddr = em.find(Address.class, sev.getLocation());
+            if(remAddr != null){      
+                TypedQuery tq = em.createQuery("SELECT COUNT(per) FROM Person per WHERE per.address.id = :addrId", Person.class);
+                Long countPersons =(Long) tq.setParameter("addrId", remAddr.getId()).getSingleResult();
+                tq = em.createQuery("SELECT COUNT(sev) FROM SocialEvent sev WHERE sev.location.id = :addrId", SocialEvent.class);
+                Long countEvents =(Long) tq.setParameter("addrId", remAddr.getId()).getSingleResult();
+                if(countEvents == 1 && countPersons == 0){  // event address referenced only once and exactly from this event
+                    em.remove(remAddr);
+                    sev.setLocation(null);
+                }
+            }
         }
         super.remove(sev);
+        }catch(RuntimeException rex){
+            LOG.error("Social Event DAO remove error >>"+rex.toString());
+            throw new PersistenceException("SocialEvent find events at address failed.");
+        }
+        
     }
     
     @Override
@@ -136,7 +147,4 @@ public class SocialEventDao extends BasicDao<SocialEvent> {
         }
         em.persist(sev);
     }
-    
-    
-    
 }
