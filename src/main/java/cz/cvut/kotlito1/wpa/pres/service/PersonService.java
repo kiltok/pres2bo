@@ -74,16 +74,7 @@ public class PersonService {
     
     @Transactional
     public void removePerson(Person p){
-        /*Person remPer = perDao.find(p.getId());         //find person
-        if(remPer == null)
-            return null;                                //cannot remove nonexisting person
-        else{
-            Collection<Person> residents = perDao.findAllAtAddressId(remPer.getAddress().getId());  //remove adresses if they belong only to this person
-            if(residents.size() == 1)    // address has only one owner TODO check with events later!!!
-                addrDao.remove(remPer.getAddress());
-            perDao.remove(remPer);       //the rest of the relations is cascaded
-            return remPer;
-        }*/
+        
         Objects.requireNonNull(p);
         perDao.remove(p);
     }
