@@ -7,12 +7,14 @@ package cz.cvut.kotlito1.wpa.pres.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -33,10 +35,81 @@ public class Reservation implements Serializable{
     @JoinColumn(name="PERSON_FK", insertable=false, updatable=false)
     private Person owner;
     
-    
+    @Column(nullable=false)
     private int resSize;
     
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date lastmodDate;
+
+    public Reservation() {
+    }
+
+    public ReservationPK getId() {
+        return id;
+    }
+
+    public void setId(ReservationPK id) {
+        this.id = id;
+    }
+
+    public SocialEvent getEventReserved() {
+        return eventReserved;
+    }
+
+    public void setEventReserved(SocialEvent eventReserved) {
+        this.eventReserved = eventReserved;
+    }
+
+    public Person getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Person owner) {
+        this.owner = owner;
+    }
+
+    public int getResSize() {
+        return resSize;
+    }
+
+    public void setResSize(int resSize) {
+        this.resSize = resSize;
+    }
+
+    public Date getLastmodDate() {
+        return lastmodDate;
+    }
+
+    public void setLastmodDate(Date lastmodDate) {
+        this.lastmodDate = lastmodDate;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + Objects.hashCode(this.eventReserved);
+        hash = 29 * hash + Objects.hashCode(this.owner);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Reservation other = (Reservation) obj;
+        if (!Objects.equals(this.eventReserved, other.eventReserved)) {
+            return false;
+        }
+        if (!Objects.equals(this.owner, other.owner)) {
+            return false;
+        }
+        return true;
+    }
+    
     
     //Composite key implementation through embedded class
     @Embeddable
@@ -52,6 +125,22 @@ public class Reservation implements Serializable{
 
         public ReservationPK(int eventId, int personId) {
             this.eventId = eventId;
+            this.personId = personId;
+        }
+
+        public int getEventId() {
+            return eventId;
+        }
+
+        public void setEventId(int eventId) {
+            this.eventId = eventId;
+        }
+
+        public int getPersonId() {
+            return personId;
+        }
+
+        public void setPersonId(int personId) {
             this.personId = personId;
         }
         
